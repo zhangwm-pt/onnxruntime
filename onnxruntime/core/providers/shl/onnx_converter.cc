@@ -716,7 +716,11 @@ void OnnxToShlConverter::Clip(const onnxruntime::Node& node) {
   NodeAttrHelper helper(node);
   auto params = shl_ep::GetShlParams<csinn_clip_params>(session_, node);
   params->base.name = const_cast<char*>(node.Name().c_str());
-
+  auto max_value = helper.Get("max", std::numeric_limits<float>::max());
+  auto min_value = helper.Get("min", std::numeric_limits<float>::min());
+  params->max_value = max_value;
+  params->min_value = min_value;
+  
   std::string input = node.InputDefs()[0]->Name();
   auto input_tensor = shl_tensor_map.at(input);
   auto in_dtype = node.InputDefs()[0]->TypeAsProto()->tensor_type();
